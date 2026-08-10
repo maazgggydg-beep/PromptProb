@@ -14,9 +14,6 @@ load_dotenv()  # loads variables from a .env file in the project root, if presen
 
 def _model(env_prefix: str, default_type: str, default_base_url: str,
            default_model: str, default_api_key: str = "") -> dict:
-    """Build a model config from env vars, falling back to defaults.
-    Lets anyone swap models via .env only, without touching this file.
-    e.g. TARGET_MODEL, TARGET_BASE_URL, TARGET_API_KEY, TARGET_TYPE"""
     return {
         "name": os.environ.get(f"{env_prefix}_NAME", default_model),
         "type": os.environ.get(f"{env_prefix}_TYPE", default_type),
@@ -26,10 +23,7 @@ def _model(env_prefix: str, default_type: str, default_base_url: str,
     }
 
 
-# ---------------------------------------------------------------------------
-# TARGET MODEL(S) — the system under test
-# ---------------------------------------------------------------------------
-# Default: Groq (fast, generous free tier). Override via .env — see .env.example.
+
 TARGETS = [
     _model(
         "TARGET",
@@ -40,11 +34,7 @@ TARGETS = [
     ),
 ]
 
-# ---------------------------------------------------------------------------
-# ATTACKER MODEL — generates & adapts attack prompts
-# ---------------------------------------------------------------------------
-# Default: local Ollama. Swap to a stronger model via .env for smarter,
-# more coherent multi-turn escalation (see README "Using a stronger attacker").
+
 ATTACKER_MODEL = _model(
     "ATTACKER",
     default_type="openai_compatible",
@@ -53,11 +43,7 @@ ATTACKER_MODEL = _model(
     default_api_key="ollama",
 )
 
-# ---------------------------------------------------------------------------
-# JUDGE MODEL — scores whether the target complied or refused
-# ---------------------------------------------------------------------------
-# Judge accuracy matters most of the three roles — a weak judge means the
-# report can't be trusted. Prefer at least a 3B-class model here.
+
 JUDGE_MODEL = _model(
     "JUDGE",
     default_type="openai_compatible",
@@ -66,9 +52,7 @@ JUDGE_MODEL = _model(
     default_api_key="ollama",
 )
 
-# ---------------------------------------------------------------------------
-# RUN SETTINGS
-# ---------------------------------------------------------------------------
+
 VARIATIONS_PER_STRATEGY = int(os.environ.get("VARIATIONS_PER_STRATEGY", 5))
 REQUEST_TIMEOUT_SECONDS = int(os.environ.get("REQUEST_TIMEOUT_SECONDS", 120))
 MAX_CONCURRENT_REQUESTS = int(os.environ.get("MAX_CONCURRENT_REQUESTS", 3))
